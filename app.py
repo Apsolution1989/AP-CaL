@@ -4,6 +4,9 @@ import math
 # ตั้งค่าหน้าเว็บ
 st.set_page_config(page_title="Pipe Flow Calculator", layout="centered")
 
+# --- เพิ่มชื่อบริษัทตรงนี้ ---
+st.caption("AP Solution (1989) Co., ltd")
+
 st.title("🌊 Pipe Flow & Pressure Drop Calculator")
 st.markdown("คำนวณอัตราการไหลและแรงดันตกคร่อมในท่อส่งน้ำ")
 
