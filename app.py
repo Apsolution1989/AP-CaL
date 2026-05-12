@@ -31,7 +31,7 @@ def calculate_metrics(D_mm, v, L):
     if reynolds < 2300:
         f = 64 / reynolds
     else:
-        f = (1.11 * math.log10(((epsilon/D)/3.7)**1.11 + (6.9/reynolds)))**-2
+        f = (1.8 * math.log10(((epsilon/D)/3.7)**1.11 + (6.9/reynolds)))**-2
     
     dp_pa = f * (L / D) * (rho * (v**2) / 2)
     dp_bar = dp_pa / 100000
