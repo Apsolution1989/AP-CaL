@@ -1,0 +1,53 @@
+import streamlit as st
+import math
+
+# ตั้งค่าหน้าเว็บ
+st.set_page_config(page_title="Pipe Flow Calculator", layout="centered")
+
+st.title("🌊 Pipe Flow & Pressure Drop Calculator")
+st.markdown("คำนวณอัตราการไหลและแรงดันตกคร่อมในท่อส่งน้ำ")
+
+# --- ส่วนรับข้อมูล (Sidebar) ---
+st.sidebar.header("Input Parameters")
+d_mm = st.sidebar.number_input("ขนาดเส้นผ่านศูนย์กลางภายใน (mm)", min_value=1.0, value=50.0)
+velocity = st.sidebar.slider("ความเร็วการไหล (m/s)", 0.1, 5.0, 1.5)
+length = st.sidebar.number_input("ความยาวท่อ (m)", min_value=1.0, value=100.0)
+
+# --- ส่วนการคำนวณ ---
+def calculate_metrics(D_mm, v, L):
+    rho = 998      # kg/m^3
+    mu = 0.001     # Pa·s
+    epsilon = 0.000045 # Roughness (m)
+    
+    D = D_mm / 1000
+    area = (math.pi * (D**2)) / 4
+    flow_m3h = area * v * 3600
+    reynolds = (rho * v * D) / mu
+    
+    # Friction factor (Haaland equation)
+    if reynolds < 2300:
+        f = 64 / reynolds
+    else:
+        f = (1.11 * math.log10(((epsilon/D)/3.7)**1.11 + (6.9/reynolds)))**-2
+    
+    dp_pa = f * (L / D) * (rho * (v**2) / 2)
+    dp_bar = dp_pa / 100000
+    return flow_m3h, reynolds, dp_bar
+
+flow, re, press_drop = calculate_metrics(d_mm, velocity, length)
+
+# --- ส่วนแสดงผลบนหน้าเว็บ ---
+col1, col2, col3 = st.columns(3)
+col1.metric("Flow Rate", f"{flow:.2f} m³/hr")
+col2.metric("Pressure Drop", f"{press_drop:.4f} bar")
+col3.metric("Reynolds No.", f"{re:.0f}")
+
+st.divider()
+
+# แสดงรายละเอียดเพิ่มเติม
+if re < 2300:
+    st.info("ลักษณะการไหล: **Laminar Flow** (การไหลแบบราบเรียบ)")
+else:
+    st.warning("ลักษณะการไหล: **Turbulent Flow** (การไหลแบบปั่นป่วน)")
+
+st.write(f"**หมายเหตุ:** คำนวณที่ความยาวท่อ {length} เมตร, ความขรุขระผิวท่อ 0.045 mm")
